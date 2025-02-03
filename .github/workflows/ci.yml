@@ -39,8 +39,8 @@ jobs:
       - name: Start MinIO Service
         run: bash .github/scripts/start_minio.sh
 
-      - name: Start Dremio Service
-        run: bash .github/scripts/start_dremio.sh
+      # - name: Start Dremio Service
+      #   run: bash .github/scripts/start_dremio.sh
 
       - name: Install MinIO Client (mc)
         run: bash .github/scripts/install_minio_client.sh
