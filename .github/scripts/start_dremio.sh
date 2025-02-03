@@ -1,7 +1,7 @@
-# #!/bin/bash
-# set -e
+#!/bin/bash
+set -e
 
-# echo "Starting Dremio service..."
+echo "Starting Dremio service..."
 
 # docker run -d \
 #   --network ci-network \
@@ -11,17 +11,6 @@
 #   -e "DREMIO_JAVA_SERVER_EXTRA_OPTS=-Ddebug.addDefaultUser=true" \
 #   dremio/dremio-oss
 
-# echo "Dremio service started."
+./enterprise/distribution/server/target/dremio-enterprise-26.0.0-SNAPSHOT/dremio-enterprise-26.0.0-SNAPSHOT/bin/dremio start
 
-#!/bin/bash
-set -e
-
-echo "Checking Dremio Enterprise service health..."
-
-# Check if Dremio is running by hitting the health endpoint
-if curl -s --head  --request GET http://localhost:9047 | grep "200 OK" > /dev/null; then 
-   echo "Dremio Enterprise service is running."
-else
-   echo "Dremio Enterprise service is not running. Please start the service."
-   exit 1
-fi
+echo "Dremio service started."

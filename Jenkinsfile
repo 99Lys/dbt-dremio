@@ -16,13 +16,25 @@ pipeline {
     DBT_TEST_USER_1 = 'dbt_test_user_1'
     DBT_TEST_USER_2 = 'dbt_test_user_2'
     DBT_TEST_USER_3 = 'dbt_test_user_3'
+    GIT_CREDENTIALS = credentials('github-dremio-jenkins-app')
   }
 
   stages {
     stage('Checkout') {
-      steps {
-        checkout scm
-      }
+        steps {
+            checkout scm  // Repo A (default checkout)
+
+            dir('dremio') {  // Checkout Repo B in a separate folder
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/dremio/dremio.git',
+                        credentialsId: 'github-app-credentials'
+                    ]]
+                ])
+            }
+        }
     }
 
     stage('Create Docker Network') {
