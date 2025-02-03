@@ -30,7 +30,7 @@ pipeline {
                     branches: [[name: '*/main']],
                     userRemoteConfigs: [[
                         url: 'https://github.com/dremio/dremio.git',
-                        credentialsId: 'github-app-credentials'
+                        credentialsId: 'github-dremio-jenkins-app'
                     ]]
                 ])
             }
