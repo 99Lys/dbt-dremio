@@ -9,6 +9,6 @@ docker run -d \
   -p 31010:31010 \
   -p 9047:9047 \
   -e "DREMIO_JAVA_SERVER_EXTRA_OPTS=-Ddebug.addDefaultUser=true" \
-  dremio/dremio-oss
+  dremio/dremio-ee:latest
 
 echo "Dremio service started."
