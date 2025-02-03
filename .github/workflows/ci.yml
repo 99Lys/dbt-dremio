@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - main
+      - EE/DC-testing-pipelines
   pull_request:
     branches:
       - main
