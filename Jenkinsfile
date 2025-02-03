@@ -1,5 +1,5 @@
 pipeline {
-  agent { label 'ubuntu' }
+  agent any
 
   environment {
     RETRY_COUNT = 12
