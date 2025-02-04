@@ -27,7 +27,7 @@ pipeline {
             dir('dremio') {  // Checkout Repo B in a separate folder
                 checkout([
                     $class: 'GitSCM',
-                    branches: [[name: '*/main']],
+                    branches: [[name: '*/master']],
                     userRemoteConfigs: [[
                         url: 'https://github.com/dremio/dremio.git',
                         credentialsId: 'github-dremio-jenkins-app'
