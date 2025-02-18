@@ -36,7 +36,11 @@ pipeline {
             }
         }
     }
-
+    stage('Setup Docker') {
+      steps {
+        sh 'sudo systemctl start docker'
+      }
+    }
     stage('Create Docker Network') {
       steps {
         sh 'docker network create ci-network || echo "Network already exists"'
