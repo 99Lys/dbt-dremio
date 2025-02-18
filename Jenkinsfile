@@ -38,7 +38,7 @@ pipeline {
     }
     stage('Setup Docker') {
       steps {
-        sh 'systemctl start docker'
+          sh 'docker info || service docker start'
       }
     }
     stage('Create Docker Network') {
