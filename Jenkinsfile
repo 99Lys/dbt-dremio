@@ -1,5 +1,5 @@
 pipeline {
-  agent docker
+  agent none
 
   environment {
     RETRY_COUNT = 12
@@ -36,12 +36,8 @@ pipeline {
             }
         }
     }
-    stage('Setup Docker') {
-      steps {
-          sh 'docker info || service docker start'
-      }
-    }
     stage('Create Docker Network') {
+      agent any
       steps {
         sh 'docker network create ci-network || echo "Network already exists"'
       }
