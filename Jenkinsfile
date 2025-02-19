@@ -1,5 +1,5 @@
 pipeline {
-  agent none
+  agent any
 
   environment {
     RETRY_COUNT = 12
