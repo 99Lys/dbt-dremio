@@ -1,5 +1,5 @@
 pipeline {
-  agent any
+  agent docker
 
   environment {
     RETRY_COUNT = 12
