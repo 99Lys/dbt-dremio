@@ -36,8 +36,13 @@ pipeline {
             }
         }
     }
+    stage('Start Docker') {
+      steps {
+        sh 'dockerd'
+      }
+    }
+    
     stage('Create Docker Network') {
-      agent any
       steps {
         sh 'docker network create ci-network || echo "Network already exists"'
       }
