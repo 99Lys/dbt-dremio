@@ -7,6 +7,9 @@ def kubeAgent = """
         app: dbt-dremio-testing
     spec:
       containers:
+      - name: main
+        image: gcr.io/dremio-1093/jenkins-agent:v32
+        tty: true
       - name: minio
         image: minio/minio
         args:
@@ -48,6 +51,7 @@ pipeline {
   agent {
       kubernetes {
           yaml kubeAgent
+          defaultContainer 'main'
       }
   }
   // parameters {
