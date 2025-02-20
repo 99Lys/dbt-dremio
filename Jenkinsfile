@@ -1,6 +1,61 @@
-pipeline {
-  agent docker
+def kubeAgent = """
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: dbt-dremio-testing
+      labels:
+        app: dbt-dremio-testing
+    spec:
+      containers:
+      - name: minio
+        image: minio/minio
+        args:
+        - server
+        - /data
+        - --console-address
+        - ":9001"
+        env:
+        - name: MINIO_ROOT_USER
+          value: "admin"
+        - name: MINIO_ROOT_PASSWORD
+          value: "password"
+        ports:
+        - containerPort: 9000
+        - containerPort: 9001
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        volumes:
+        - name: data
+          emptyDir: {}
+      - name: dremio
+        image: dremio/dremio-oss
+        env:
+        - name: DREMIO_JAVA_SERVER_EXTRA_OPTS
+          value: "-Ddebug.addDefaultUser=true"
+        ports:
+        - containerPort: 31010
+        - containerPort: 9047
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: data
+        emptyDir: {}
+"""
 
+pipeline {
+  agent {
+      kubernetes {
+          yaml kubeAgent
+      }
+  }
+  // parameters {
+  //     string(name: 'JENKINS_BUILD_NAME', defaultValue: '', description: '''The Name of the build we're building images for e.g: cloud/DC-151, master or pull-requests''')
+  //     string(name: 'JENKINS_BUILD_NUMBER', defaultValue: '', description: '''The Number of the job we're building images for e.g: 1950(master), 2(cloud-DC or PR)''')
+  //     string(name: 'DREMIO_PR_NUM', defaultValue: '', description: '''Only applies to pull request builds. ID number from the GitHub PR e.g: 177''')
+  //     booleanParam(name: 'update_params', defaultValue: 'false', description: '''Only update parameters for the pipeline (declarative pipelines require this...)''')
+  // }
   environment {
     RETRY_COUNT = 12
     SLEEP_INTERVAL = 5
@@ -35,29 +90,6 @@ pipeline {
                 ])
             }
         }
-    }
-    stage('Start Docker') {
-      steps {
-        sh 'dockerd'
-      }
-    }
-
-    stage('Create Docker Network') {
-      steps {
-        sh 'docker network create ci-network || echo "Network already exists"'
-      }
-    }
-
-    stage('Start MinIO Service') {
-      steps {
-        sh 'bash .github/scripts/start_minio.sh'
-      }
-    }
-
-    stage('Start Dremio Service') {
-      steps {
-        sh 'bash .github/scripts/start_dremio.sh'
-      }
     }
 
     stage('Install MinIO Client (mc)') {
