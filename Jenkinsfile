@@ -97,22 +97,32 @@ pipeline {
         }
     }
 
-    stage('Install MinIO Client (mc)') {
+    stage('Setup MinIO Client (mc)') {
       steps {
-        sh 'bash .github/scripts/install_minio_client.sh'
+        container('jnlp') {
+          script {
+            sh 'bash .github/scripts/install_minio_client.sh'
+            sh 'bash .github/scripts/create_minio_bucket.sh'
+          }
+        }
       }
     }
 
-    stage('Create MinIO bucket') {
-      steps {
-        sh 'bash .github/scripts/create_minio_bucket.sh'
-      }
-    }
+    // stage('Create MinIO bucket') {
+    //   steps {
+    //     sh 'bash .github/scripts/create_minio_bucket.sh'
+    //   }
+    // }
 
     stage('Create and Format Sources') {
       steps {
-        sh 'bash .github/scripts/create_and_format_sources.sh'
+        container('jnlp') {
+          script {
+            sh 'bash .github/scripts/create_and_format_sources.sh'
+          }
+        }
       }
     }
+    
   }
 }
