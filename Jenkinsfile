@@ -71,7 +71,6 @@ pipeline {
     DBT_TEST_USER_1 = 'dbt_test_user_1'
     DBT_TEST_USER_2 = 'dbt_test_user_2'
     DBT_TEST_USER_3 = 'dbt_test_user_3'
-    GIT_CREDENTIALS = credentials('github-dremio-jenkins-app')
   }
 
   stages {
@@ -90,6 +89,24 @@ pipeline {
                 ])
             }
         }
+    }
+
+    stage('Check Container Status') {
+      steps {
+        script {
+          def podName = sh(script: "kubectl get pods -l app=dbt-dremio-testing -o jsonpath='{.items[0].metadata.name}'", returnStdout: true).trim()
+          
+          def minioStatus = sh(script: "kubectl get pod ${podName} -o jsonpath='{.status.containerStatuses[?(@.name==\"minio\")].state}'", returnStdout: true).trim()
+          if (!minioStatus.contains('running')) {
+            error "MinIO container is not running. Current status: ${minioStatus}"
+          }
+          
+          def dremioStatus = sh(script: "kubectl get pod ${podName} -o jsonpath='{.status.containerStatuses[?(@.name==\"dremio\")].state}'", returnStdout: true).trim()
+          if (!dremioStatus.contains('running')) {
+            error "Dremio container is not running. Current status: ${dremioStatus}"
+          }
+        }
+      }
     }
 
     stage('Install MinIO Client (mc)') {
