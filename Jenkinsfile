@@ -7,8 +7,10 @@ def kubeAgent = """
         app: dbt-dremio-testing
     spec:
       containers:
-      - name: main
+      - name: jnlp
         image: gcr.io/dremio-1093/jenkins-agent:v32
+        securityContext:
+          runAsUser: 0
         tty: true
       - name: minio
         image: minio/minio
@@ -93,24 +95,6 @@ pipeline {
                 ])
             }
         }
-    }
-
-    stage('Check Container Status') {
-      steps {
-        script {
-          def podName = sh(script: "kubectl get pods -l app=dbt-dremio-testing -o jsonpath='{.items[0].metadata.name}'", returnStdout: true).trim()
-          
-          def minioStatus = sh(script: "kubectl get pod ${podName} -o jsonpath='{.status.containerStatuses[?(@.name==\"minio\")].state}'", returnStdout: true).trim()
-          if (!minioStatus.contains('running')) {
-            error "MinIO container is not running. Current status: ${minioStatus}"
-          }
-          
-          def dremioStatus = sh(script: "kubectl get pod ${podName} -o jsonpath='{.status.containerStatuses[?(@.name==\"dremio\")].state}'", returnStdout: true).trim()
-          if (!dremioStatus.contains('running')) {
-            error "Dremio container is not running. Current status: ${dremioStatus}"
-          }
-        }
-      }
     }
 
     stage('Install MinIO Client (mc)') {
