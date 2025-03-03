@@ -33,6 +33,8 @@ AUTH_RESPONSE=$(curl -s -X POST "http://localhost:9047/apiv2/login" \
 
 AUTH_TOKEN=$(echo "$AUTH_RESPONSE" | jq -r .token)
 
+export AUTH_TOKEN
+
 # Check if AUTH_TOKEN is not empty
 if [ -z "$AUTH_TOKEN" ] || [ "$AUTH_TOKEN" == "null" ]; then
   echo "Failed to obtain Dremio auth token."
