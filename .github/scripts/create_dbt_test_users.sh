@@ -17,7 +17,7 @@ create_user() {
   local password=$5
 
   curl -s 'http://localhost:9047/api/v3/user' \
-    -H "Authorization: _dremio$AUTH_TOKEN" \
+    -H "Authorization:_dremio$AUTH_TOKEN" \
     -H 'Content-Type: application/json' \
     --data-raw "{\"firstName\":\"$firstName\",\"lastName\":\"$lastName\",\"name\":\"$name\",\"email\":\"$email\",\"password\":\"$password\"}"
   
