@@ -33,8 +33,6 @@ AUTH_RESPONSE=$(curl -s -X POST "http://localhost:9047/apiv2/login" \
 
 AUTH_TOKEN=$(echo "$AUTH_RESPONSE" | jq -r .token)
 
-export AUTH_TOKEN
-
 # Check if AUTH_TOKEN is not empty
 if [ -z "$AUTH_TOKEN" ] || [ "$AUTH_TOKEN" == "null" ]; then
   echo "Failed to obtain Dremio auth token."
@@ -80,3 +78,6 @@ curl -s -X PUT "http://localhost:9047/apiv2/source/Samples/folder_format/samples
   --data-raw "{\"ignoreOtherFileFormats\":false,\"type\":\"Parquet\"}"
 
 echo "NYC-taxi-trips formatted in Dremio."
+
+# Return the auth token
+echo $AUTH_TOKEN
