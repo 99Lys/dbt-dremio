@@ -9,8 +9,6 @@ set -e
 : "${MINIO_ROOT_USER:?Need to set MINIO_ROOT_USER}"
 : "${MINIO_ROOT_PASSWORD:?Need to set MINIO_ROOT_PASSWORD}"
 
-echo "Creating Dremio S3 Source..."
-
 for i in $(seq 1 $RETRY_COUNT); do
   if curl -s $DREMIO_HEALTH_URL; then
     echo "Dremio is up."
@@ -27,7 +25,7 @@ fi
 
 # Obtain Dremio auth token
 echo "Logging into Dremio to obtain auth token..."
-AUTH_RESPONSE=$(curl -s -X POST "http://localhost:9047/apiv2/login" \
+AUTH_RESPONSE=$(curl -s -X POST "$DREMIO_HEALTH_URL/apiv2/login" \
   -H "Content-Type: application/json" \
   --data "{\"userName\":\"${DREMIO_SOFTWARE_USERNAME}\", \"password\":\"${DREMIO_SOFTWARE_PASSWORD}\"}")
 
@@ -46,38 +44,53 @@ if [ "$GITHUB_ACTIONS" = "true" ]; then
   echo "AUTH_TOKEN=${AUTH_TOKEN}" >> $GITHUB_ENV
 fi
 
-# Create the S3 source in Dremio
 echo "Creating the S3 source in Dremio..."
-curl -s -X PUT "http://localhost:9047/apiv2/source/dbt_test_source" \
+curl -s -X PUT "$DREMIO_HEALTH_URL/apiv2/source/dbt_test_source" \
   -H "Content-Type: application/json" \
   -H "Authorization: _dremio$AUTH_TOKEN" \
   --data "{\"name\":\"dbt_test_source\",\"config\":{\"credentialType\":\"ACCESS_KEY\",\"accessKey\":\"$MINIO_ROOT_USER\",\"accessSecret\":\"$MINIO_ROOT_PASSWORD\",\"secure\":false,\"externalBucketList\":[],\"enableAsync\":true,\"enableFileStatusCheck\":true,\"rootPath\":\"/\",\"defaultCtasFormat\":\"ICEBERG\",\"propertyList\":[{\"name\":\"fs.s3a.path.style.access\",\"value\":\"true\"},{\"name\":\"fs.s3a.endpoint\",\"value\":\"minio:9000\"},{\"name\":\"dremio.s3.compat\",\"value\":\"true\"}],\"whitelistedBuckets\":[],\"isCachingEnabled\":false,\"maxCacheSpacePct\":100},\"type\":\"S3\",\"metadataPolicy\":{\"deleteUnavailableDatasets\":true,\"autoPromoteDatasets\":false,\"namesRefreshMillis\":3600000,\"datasetDefinitionRefreshAfterMillis\":3600000,\"datasetDefinitionExpireAfterMillis\":10800000,\"authTTLMillis\":86400000,\"updateMode\":\"PREFETCH_QUERIED\"}}"
-
-echo "S3 Source created in Dremio."
+if [ $? -eq 0 ]; then
+  echo "S3 source created in Dremio."
+else
+  echo "Failed to create S3 source in Dremio."
+  exit 1
+fi
 
 echo "Creating the Samples source in Dremio..."
-curl -s -X PUT  "http://localhost:9047/apiv2/source/Samples" \
+curl -s -X PUT "$DREMIO_HEALTH_URL/apiv2/source/Samples" \
   -H "Content-Type: application/json" \
   -H "Authorization: _dremio$AUTH_TOKEN" \
   --data-raw "{\"name\":\"Samples\",\"config\":{\"externalBucketList\":[\"samples.dremio.com\"],\"credentialType\":\"NONE\",\"secure\":false,\"propertyList\":[]},\"name\":\"Samples\",\"accelerationRefreshPeriod\":3600000,\"accelerationGracePeriod\":10800000,\"accelerationNeverRefresh\":true,\"accelerationNeverExpire\":true,\"accelerationActivePolicyType\":\"PERIOD\",\"accelerationRefreshSchedule\":\"0 0 8 * * *\",\"accelerationRefreshOnDataChanges\":false,\"type\":\"S3\"}"
-
-echo "Samples source created in Dremio."
+if [ $? -eq 0 ]; then
+  echo "Samples source created in Dremio."
+else
+  echo "Failed to create Samples source in Dremio."
+  exit 1
+fi
 
 echo "Formatting SF_incidents2016..."
-curl -s -X PUT "http://localhost:9047/apiv2/source/Samples/file_format/samples.dremio.com/SF_incidents2016.json" \
+curl -s -X PUT "$DREMIO_HEALTH_URL/apiv2/source/Samples/file_format/samples.dremio.com/SF_incidents2016.json" \
   -H "Content-Type: application/json" \
   -H "Authorization: _dremio$AUTH_TOKEN" \
   --data-raw "{\"type\":\"JSON\"}"
-
-echo "SF_incidents2016 formatted in Dremio."
+if [ $? -eq 0 ]; then
+  echo "SF_incidents2016 formatted in Dremio."
+else
+  echo "Failed to format SF_incidents2016 in Dremio."
+  exit 1
+fi
 
 echo "Formatting NYC-taxi-trips..."
-curl -s -X PUT "http://localhost:9047/apiv2/source/Samples/folder_format/samples.dremio.com/NYC-taxi-trips" \
+curl -s -X PUT "$DREMIO_HEALTH_URL/apiv2/source/Samples/folder_format/samples.dremio.com/NYC-taxi-trips" \
   -H "Content-Type: application/json" \
   -H "Authorization: _dremio$AUTH_TOKEN" \
   --data-raw "{\"ignoreOtherFileFormats\":false,\"type\":\"Parquet\"}"
-
-echo "NYC-taxi-trips formatted in Dremio."
+if [ $? -eq 0 ]; then
+  echo "NYC-taxi-trips formatted in Dremio."
+else
+  echo "Failed to format NYC-taxi-trips in Dremio."
+  exit 1
+fi
 
 # Return the auth token
 echo $AUTH_TOKEN
