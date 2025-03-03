@@ -44,6 +44,7 @@ echo "::add-mask::$AUTH_TOKEN"
 if [ "$GITHUB_ACTIONS" = "true" ]; then
   echo "Running in GitHub Actions"
   echo "AUTH_TOKEN=${AUTH_TOKEN}" >> $GITHUB_ENV
+fi
 
 # Create the S3 source in Dremio
 echo "Creating the S3 source in Dremio..."
