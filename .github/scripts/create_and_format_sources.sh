@@ -50,7 +50,7 @@ manipulate_source() {
   local description=$3
 
   echo "$description in Dremio..."
-  RESPONSE=$(curl -s -w "\n%{http_code}" -X PUT "$url" \
+  RESPONSE=$(curl --fail -s -w "\n%{http_code}" -X PUT "$url" \
     -H "Content-Type: application/json" \
     -H "Authorization: _dremio$AUTH_TOKEN" \
     --data "$data")
@@ -59,9 +59,9 @@ manipulate_source() {
   RESPONSE_BODY=$(echo "$RESPONSE" | sed '$d')
 
   if [ "$HTTP_STATUS" -eq 200 ]; then
-    echo -e "\n$description source created in Dremio."
+    echo -e "\n$description successfull in Dremio."
   else
-    echo -e "\n$description failed. HTTP status code: $RESPONSE"
+    echo -e "\n$description failed: $RESPONSE_BODY"
     exit 1
   fi
 }
