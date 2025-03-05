@@ -50,7 +50,7 @@ manipulate_source() {
   local description=$3
 
   echo "$description in Dremio..."
-  RESPONSE=$(curl --fail -s -w "\n%{http_code}" -X PUT "$url" \
+  RESPONSE=$(curl --show-error --fail -s -w "\n%{http_code}" -X PUT "$url" \
     -H "Content-Type: application/json" \
     -H "Authorization: _dremio$AUTH_TOKEN" \
     --data "$data")
