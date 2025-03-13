@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import ipdb
 
 import agate
 from typing import Tuple, Optional, List
@@ -53,10 +54,11 @@ class DremioConnectionManager(SQLConnectionManager):
     DEFAULT_CONNECTION_RETRIES = 5
 
     retries = DEFAULT_CONNECTION_RETRIES
-
+    
     @contextmanager
     def exception_handler(self, sql):
         try:
+            ipdb.set_trace()
             yield
         except Exception as e:
             logger.debug(f"Error running SQL: {sql}")

@@ -90,7 +90,7 @@ class CloudParametersBuilder(ParametersBuilder):
     cloud_project_id: str = None
 
     def build_base_url(self):
-        protocol = "https"
+        protocol = "http"
         base_url = f"{protocol}://{self.cloud_host}"
         return base_url
 
