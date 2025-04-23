@@ -48,6 +48,8 @@ else # Jenkins
   HOST="localhost"
 fi
 
+echo $HOST
+
 manipulate_source() {
   local url=$1
   local data=$2
