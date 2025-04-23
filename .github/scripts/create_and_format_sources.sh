@@ -39,14 +39,14 @@ fi
 
 echo "Obtained Dremio auth token."
 echo "::add-mask::$AUTH_TOKEN"
-if [ "$GITHUB_ACTIONS" = "true" ]; then
-  echo "Running in GitHub Actions"
-  echo "AUTH_TOKEN=${AUTH_TOKEN}" >> $GITHUB_ENV
-  HOST="minio"
-else # Jenkins
-  echo $AUTH_TOKEN > /tmp/auth_token.txt
-  HOST="localhost"
-fi
+# if [ "$GITHUB_ACTIONS" = "true" ]; then
+#   echo "Running in GitHub Actions"
+#   echo "AUTH_TOKEN=${AUTH_TOKEN}" >> $GITHUB_ENV
+#   HOST="minio"
+# else # Jenkins
+#   echo $AUTH_TOKEN > /tmp/auth_token.txt
+#   HOST="localhost"
+# fi
 
 echo $HOST
 
