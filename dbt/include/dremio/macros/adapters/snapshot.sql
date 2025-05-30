@@ -31,7 +31,7 @@ limitations under the License.*/
       and DBT_INTERNAL_DEST.{{ columns.dbt_valid_to }} is null
     {%- endif %}
     and DBT_INTERNAL_SOURCE.dbt_change_type in ('update','delete')
-    then update
+      then update
       set {{ columns.dbt_valid_to }} = DBT_INTERNAL_SOURCE.{{ columns.dbt_valid_to }}
 
   when not matched
