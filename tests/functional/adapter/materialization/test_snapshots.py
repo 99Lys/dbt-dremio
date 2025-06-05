@@ -36,7 +36,7 @@ class TestSnapshotCheckColsDremio(BaseSnapshotCheckCols):
         test_file = request.module.__name__
         # We only want the last part of the name
         test_file = test_file.split(".")[-1]
-        unique_schema = f"datalake.{prefix}_{test_file}"
+        unique_schema = f"{BUCKET}.{prefix}_{test_file}"
         return unique_schema
 
     @pytest.fixture(scope="class")
@@ -87,7 +87,7 @@ class TestSnapshotCheckColsDremio(BaseSnapshotCheckCols):
         result = project.run_sql(f"select * from {relation}", fetch="all")
 
         # point at the "added" seed so the snapshot sees 10 new rows
-        results = run_dbt(["--no-partial-parse", "snapshot", "--vars", "seed_name: added"])
+        results = run_dbt(["--no-partial-parse", "snapshot", "--vars", "seed_name: added", "--debug"])
         for result in results:
             assert result.status == "success"
 
@@ -106,7 +106,7 @@ class TestSnapshotCheckColsDremio(BaseSnapshotCheckCols):
         update_rows(project.adapter, update_rows_config)
 
         # re-run snapshots, using "added'
-        results = run_dbt(["snapshot", "--vars", "seed_name: added"])
+        results = run_dbt(["snapshot", "--vars", "seed_name: added", "--debug"])
         for result in results:
             assert result.status == "success"
 
@@ -130,7 +130,7 @@ class TestSnapshotCheckColsDremio(BaseSnapshotCheckCols):
         update_rows(project.adapter, update_rows_config)
 
         # re-run snapshots, using "added'
-        results = run_dbt(["snapshot", "--vars", "seed_name: added"])
+        results = run_dbt(["snapshot", "--vars", "seed_name: added", "--debug"])
         for result in results:
             assert result.status == "success"
 
